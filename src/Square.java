@@ -1,68 +1,124 @@
-import java.util.HashSet;
-import java.util.Vector;
+import java.util.*;
 
-public class Square {
+public abstract class Square {
     public byte dimension;
-    public byte[][] square;
-    public boolean[][] rows;
-    public boolean[][] columns;
+    public Variable[][] square;
+    public Configuration configuration;
+    public PriorityQueue<Variable> priorityQueue;
 
-    public Square(byte dimension) {
-        this.dimension = dimension;
+    public int noOfFailure;
+    public int noOfConsistencyChecking;
 
-        rows = new boolean[dimension][dimension + 1];
-        columns = new boolean[dimension][dimension + 1];
-    }
+    public Value[] values;
 
-    public Square(byte dimension, byte[][] square) {
-        this(dimension);
-        this.square = square;
+    public Square(byte[][] s, Configuration conf) {
+        configuration = conf;
+        dimension = (byte) s.length;
+
+        noOfConsistencyChecking = 0;
+        noOfFailure = 0;
+        priorityQueue = new PriorityQueue<>(new VariableComparator(configuration));
+        square = new Variable[dimension][dimension];
+        values = new Value[dimension + 1];
+
+        for (byte i = 0; i < dimension; i++) {
+            values[i + 1] = new Value((byte) (i+1));
+            for (byte j = 0; j < dimension; j++) {
+                square[i][j] = new Variable(dimension, i, j);
+            }
+        }
 
         for (byte i = 0; i < dimension; i++) {
             for (byte j = 0; j < dimension; j++) {
-                this.square[i][j] = square[i][j];
-                if(square[i][j] != Constants.NOT_SET)
-                {
-                    rows[i][square[i][j]] = true;
-                    columns[j][square[i][j]] = true;
-                }
+                if(s[i][j] != Constants.NOT_SET)
+                    updateHueristics(i, j, s[i][j]);
+            }
+        }
+
+        for (byte i = 0; i < dimension; i++) {
+            for (byte j = 0; j < dimension; j++) {
+                if(s[i][j] == Constants.NOT_SET)
+                    priorityQueue.add(square[i][j]);
             }
         }
     }
 
-    public boolean backtrack(int x){
+    public Vector<Change> updateHueristics(byte x, byte y, byte value){
+        square[x][y].value = values[value];
 
-        if(x == dimension*dimension)
-            return true;
+        Vector<Change> changes = new Vector<>(dimension*2-2);
+        Change change;
 
-        int i = x/dimension;
-        int j = x%dimension;
-
-        if(square[i][j] != Constants.NOT_SET)
-            return backtrack(x + 1);
-
-        for (byte k = 1; k <= dimension; k++) {
-            square[i][j] = k;
-            if(!rows[i][k]){
-                rows[i][k] = true;
-                if(!columns[j][k]){
-                    columns[j][k] = true;
-                    if(backtrack(x + 1)){
-                        return true;
-                    }
-                    columns[j][k] = false;
-                }
-                rows[i][k] = false;
+        int i,j;
+        for (int k = 0; k < dimension*2; k++){
+            if(k<dimension) {
+                i = x;
+                j = k;
             }
-            square[i][j] = Constants.NOT_SET;
+            else {
+                i = k%dimension;
+                j = y;
+            }
+
+            if(square[i][j].isNotAssigned()){
+                change = new Change(square[i][j]);
+
+                /// updating domain
+                if(square[i][j].domain.remove(square[x][y].value))
+                    change.value = square[x][y].value;
+
+                /// Updating dynamic degree
+                if(configuration.needToCalculateDynamicDegree())
+                    square[i][j].dynamicDegree--;
+
+                /// Updating IBS value
+                else if(configuration.needToCalculateIBS()) { }
+
+                /// update priority queue
+                if(priorityQueue.remove(square[i][j]))
+                    priorityQueue.add(square[i][j]);
+
+                changes.add(change);
+            }
         }
-        return false;
+
+        return changes;
     }
+
+    public void undoChanges(Vector<Change> changes){
+        for (Change change:changes) {
+            square[change.x][change.y].dynamicDegree = change.dynamicDegree;
+            square[change.x][change.y].ibs = change.ibs;
+            if (change.value != null)
+                square[change.x][change.y].domain.add(change.value);
+
+            /// update priority queue
+            if(priorityQueue.remove(square[change.x][change.y]))
+                priorityQueue.add(square[change.x][change.y]);
+        }
+    }
+
+    public void printResult(){
+        System.out.println("No of Consistency Checking: " + noOfConsistencyChecking);
+        System.out.println("No of Failure: " + noOfFailure);
+    }
+
+    public boolean isVariableAssigned(int i, int j){
+        return square[i][j].isAssigned();
+    }
+
+    public boolean isVariableNotAssigned(int i, int j){
+        return square[i][j].isNotAssigned();
+    }
+
+    public abstract boolean backtrack();
 
     public boolean isLatinSquare(){
+        if(priorityQueue.size()>0)
+            return false;
         for (byte i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                if(square[i][j] == Constants.NOT_SET)
+            for (byte j = 0; j < dimension; j++) {
+                if(isVariableNotAssigned(i, j))
                     return false;
             }
         }
@@ -75,7 +131,7 @@ public class Square {
 
         for (byte i = 0; i < dimension; i++) {
             for (byte j = 0; j < dimension; j++) {
-                System.out.print(square[i][j] + "\t");
+                System.out.print(square[i][j].getByteValue() + "\t");
             }
             System.out.println();
         }

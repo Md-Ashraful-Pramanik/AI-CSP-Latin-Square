@@ -1,0 +1,5 @@
+public enum AlgorithmTypes {
+    BACKTRACKING,
+    FORWARD_CHECKING,
+    MAXIMAL_ARC_CONSISTENCY
+}
