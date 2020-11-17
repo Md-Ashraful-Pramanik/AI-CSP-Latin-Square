@@ -16,21 +16,23 @@ public class SquareBT extends Square {
         Variable temp = priorityQueue.poll();
 
         for (byte i = 1; i <= dimension; i++) {
-            noOfConsistencyChecking++;
+            noOfNodes++;
             if(!temp.domain.contains(values[i]))
                 noOfFailure++;
             else {
                 Vector<Change> changes = updateHueristics(temp.x, temp.y, i);
-                if (backtrack()) return true;
-                noOfFailure++;
+                if (backtrack())
+                    return true;
                 undoChanges(changes);
             }
         }
 
+        noOfFailure++;
         temp.value = null;
         priorityQueue.add(temp);
         return false;
     }
+
 //    @Override
 //    public boolean backtrack(){
 //        return true;

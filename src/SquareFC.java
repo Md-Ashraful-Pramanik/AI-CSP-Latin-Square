@@ -10,21 +10,23 @@ public class SquareFC extends Square {
     public boolean backtrack() {
         if (priorityQueue.size() == 0)
             return true;
-        if (priorityQueue.peek().domain.size() <= 0)
+        if (priorityQueue.peek().domain.size() <= 0){
+            System.out.println("Not worked");
             return false;
+        }
 
         Variable temp = priorityQueue.poll();
 
         for (Value v:temp.domain) {
-            noOfConsistencyChecking++;
+            noOfNodes++;
             Vector<Change> changes = updateHueristics(temp.x, temp.y, v.value);
-            if (backtrack()) return true;
-            noOfFailure++;
+            if(isBackTrack)
+                return revert(changes, temp);
+            if (backtrack())
+                return true;
             undoChanges(changes);
         }
 
-        temp.value = null;
-        priorityQueue.add(temp);
-        return false;
+        return revert(null, temp);
     }
 }
