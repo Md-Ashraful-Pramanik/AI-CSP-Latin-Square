@@ -1,7 +1,5 @@
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Main {
     public static void main(String[] args) {
@@ -9,20 +7,20 @@ public class Main {
 
         String[] fileNames = testCaseFileNames();
 
+//
+//        for (String fileName : fileNames) {
+//            for (AlgorithmTypes types : AlgorithmTypes.values()) {
+                Square latinSquare = SquareFactory.getSquare(AlgorithmTypes.BACKTRACKING,
+                        Heuristics.BRELAZ, "data/d-15-01.txt.txt");
 
-        for (String fileName : fileNames) {
-            for (AlgorithmTypes types : AlgorithmTypes.values()) {
-                Square latinSquare = SquareFactory.getSquare(types,
-                        Heuristics.BRELAZ, fileName);
-                //latinSquare.print();
                 latinSquare.backtrack();
                 //latinSquare.print();
 
-                System.out.println("Algorithm: " + types + ". TestCase: " + fileName);
+                //System.out.println("Algorithm: " + types + ". TestCase: " + fileName);
                 latinSquare.printResult();
                 System.out.println();
-            }
-        }
+//            }
+//        }
 
     }
 

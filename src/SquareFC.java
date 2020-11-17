@@ -8,19 +8,14 @@ public class SquareFC extends Square {
 
     @Override
     public boolean backtrack() {
-        if (priorityQueue.size() == 0)
+        if(unassignedVariables.size() == 0)
             return true;
-        if (priorityQueue.peek().domain.size() <= 0){
-            System.out.println("Not worked");
-            return false;
-        }
-
-        Variable temp = priorityQueue.poll();
+        Variable temp = getNextVariable();
 
         for (Value v:temp.domain) {
             noOfNodes++;
-            Vector<Change> changes = updateHueristics(temp.x, temp.y, v.value);
-            if(isBackTrack)
+            Vector<Change> changes = updateHeuristics(temp.x, temp.y, v.value);
+            if(invalid)
                 return revert(changes, temp);
             if (backtrack())
                 return true;

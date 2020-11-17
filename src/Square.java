@@ -4,12 +4,12 @@ public abstract class Square {
     public byte dimension;
     public Variable[][] square;
     public Configuration configuration;
-    public PriorityQueue<Variable> priorityQueue;
+    public Vector<Variable> unassignedVariables;
 
     public int noOfFailure;
     public int noOfNodes;
 
-    public boolean isBackTrack;
+    public boolean invalid;
 
     public Value[] values;
 
@@ -19,7 +19,9 @@ public abstract class Square {
 
         noOfNodes = 0;
         noOfFailure = 0;
-        priorityQueue = new PriorityQueue<>(new VariableComparator(configuration));
+
+        unassignedVariables = new Vector<>(dimension * dimension);
+
         square = new Variable[dimension][dimension];
         values = new Value[dimension + 1];
 
@@ -33,20 +35,15 @@ public abstract class Square {
         for (byte i = 0; i < dimension; i++) {
             for (byte j = 0; j < dimension; j++) {
                 if (s[i][j] != Constants.NOT_SET)
-                    updateHueristics(i, j, s[i][j]);
-            }
-        }
-
-        for (byte i = 0; i < dimension; i++) {
-            for (byte j = 0; j < dimension; j++) {
-                if (s[i][j] == Constants.NOT_SET)
-                    priorityQueue.add(square[i][j]);
+                    updateHeuristics(i, j, s[i][j]);
+                else
+                    unassignedVariables.add(square[i][j]);
             }
         }
     }
 
-    public Vector<Change> updateHueristics(byte x, byte y, byte value) {
-        isBackTrack = false;
+    public Vector<Change> updateHeuristics(byte x, byte y, byte value) {
+        invalid = false;
         square[x][y].value = values[value];
 
         Vector<Change> changes = new Vector<>(dimension * 2 - 2);
@@ -74,18 +71,14 @@ public abstract class Square {
                 if (configuration.needToCalculateDynamicDegree())
                     square[i][j].dynamicDegree--;
 
-                    /// Updating IBS value
-                else if (configuration.needToCalculateIBS()) {
-                }
-
-                /// update priority queue
-                if (priorityQueue.remove(square[i][j]))
-                    priorityQueue.add(square[i][j]);
+                /// Updating IBS value
+//                else if (configuration.needToCalculateIBS()) {
+//                }
 
                 changes.add(change);
 
-                if(!checkConsistency(i, j)) {
-                    isBackTrack = true;
+                if (!checkConsistency(i, j)) {
+                    invalid = true;
                     return changes;
                 }
             }
@@ -94,7 +87,7 @@ public abstract class Square {
         return changes;
     }
 
-    protected boolean checkConsistency(int x, int y){
+    protected boolean checkConsistency(int x, int y) {
         return square[x][y].domain.size() != 0;
     }
 
@@ -106,10 +99,6 @@ public abstract class Square {
             square[change.x][change.y].ibs = change.ibs;
             if (change.value != null)
                 square[change.x][change.y].domain.add(change.value);
-
-            /// update priority queue
-            if (priorityQueue.remove(square[change.x][change.y]))
-                priorityQueue.add(square[change.x][change.y]);
         }
     }
 
@@ -117,11 +106,65 @@ public abstract class Square {
         undoChanges(changes);
 
         noOfFailure++;
-
         temp.value = null;
-        priorityQueue.add(temp);
+        unassignedVariables.add(temp);
 
         return false;
+    }
+
+    public Variable getNextVariable() {
+        Variable v1 = unassignedVariables.get(0);
+        int index = 0;
+        Variable v2;
+
+        for (int i = 1; i < unassignedVariables.size(); i++) {
+            v2 = unassignedVariables.get(i);
+            switch (configuration.heuristics) {
+                case SDF:
+                    if (v1.domain.size() > v2.domain.size()) {
+                        v1 = v2;
+                        index = i;
+                    }
+                    break;
+                case MAX_DYNAMIC_DEGREE:
+                    if (v1.dynamicDegree > v2.dynamicDegree) {
+                        v1 = v2;
+                        index = i;
+                    }
+                    break;
+                case BRELAZ:
+                    if (v1.dynamicDegree > v2.dynamicDegree) {
+                        v1 = v2;
+                        index = i;
+                    }
+                    else if (v1.dynamicDegree == v2.dynamicDegree) {
+                        if (v1.domain.size() > v2.domain.size()) {
+                            v1 = v2;
+                            index = i;
+                        }
+                    }
+//                    if (v1.domain.size() == v2.domain.size()) {
+//                        if (v1.dynamicDegree > v2.dynamicDegree) {
+//                            v1 = v2;
+//                            index = i;
+//                        }
+//                    } else if (v1.domain.size() > v2.domain.size()) {
+//                        v1 = v2;
+//                        index = i;
+//                    }
+                    break;
+                case DOM_D_DEG:
+                    if (Math.ceil((((double) v1.domain.size()) / v1.dynamicDegree)) >
+                            Math.ceil((((double) v2.domain.size()) / v2.dynamicDegree))) {
+                        v1 = v2;
+                        index = i;
+                    }
+                    break;
+            }
+        }
+
+        unassignedVariables.remove(index);
+        return v1;
     }
 
     public void printResult() {
@@ -140,7 +183,7 @@ public abstract class Square {
     public abstract boolean backtrack();
 
     public boolean isLatinSquare() {
-        if (priorityQueue.size() > 0)
+        if (unassignedVariables.size() > 0)
             return false;
         for (byte i = 0; i < dimension; i++) {
             for (byte j = 0; j < dimension; j++) {

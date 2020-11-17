@@ -8,29 +8,24 @@ public class SquareBT extends Square {
 
     @Override
     public boolean backtrack() {
-        if (priorityQueue.size() == 0)
+        if(unassignedVariables.size() == 0)
             return true;
-        if (priorityQueue.peek().domain.size() <= 0)
-            return false;
 
-        Variable temp = priorityQueue.poll();
+        Variable temp = getNextVariable();
 
         for (byte i = 1; i <= dimension; i++) {
             noOfNodes++;
             if(!temp.domain.contains(values[i]))
                 noOfFailure++;
             else {
-                Vector<Change> changes = updateHueristics(temp.x, temp.y, i);
+                Vector<Change> changes = updateHeuristics(temp.x, temp.y, i);
                 if (backtrack())
                     return true;
                 undoChanges(changes);
             }
         }
 
-        noOfFailure++;
-        temp.value = null;
-        priorityQueue.add(temp);
-        return false;
+        return revert(null, temp);
     }
 
 //    @Override

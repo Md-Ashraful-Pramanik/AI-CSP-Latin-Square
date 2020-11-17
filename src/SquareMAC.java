@@ -8,19 +8,15 @@ public class SquareMAC extends Square {
 
     @Override
     public boolean backtrack() {
-        if (priorityQueue.size() == 0)
+        if(unassignedVariables.size() == 0)
             return true;
-        if (priorityQueue.peek().domain.size() <= 0) {
-            System.out.println("Not worked");
-            return false;
-        }
 
-        Variable temp = priorityQueue.poll();
+        Variable temp = getNextVariable();
 
         for (Value v : temp.domain) {
             noOfNodes++;
-            Vector<Change> changes = updateHueristics(temp.x, temp.y, v.value);
-            if (isBackTrack)
+            Vector<Change> changes = updateHeuristics(temp.x, temp.y, v.value);
+            if (invalid)
                 return revert(changes, temp);
 
             if (updateUsingLastUpdates(changes))
@@ -77,8 +73,8 @@ public class SquareMAC extends Square {
             c = changes.get(i);
             if (square[c.x][c.y].domain.size() == 1) {
                 for (Value v : square[c.x][c.y].domain) {
-                    changes.addAll(updateHueristics(c.x, c.y, v.value));
-                    if (isBackTrack) return true;
+                    changes.addAll(updateHeuristics(c.x, c.y, v.value));
+                    if (invalid) return true;
                 }
             }
         }
