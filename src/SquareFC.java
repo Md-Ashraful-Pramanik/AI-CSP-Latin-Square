@@ -8,14 +8,14 @@ public class SquareFC extends Square {
 
     @Override
     public boolean backtrack() {
-        if(unassignedVariables.size() == 0)
+        if (unassignedVariables.size() == 0)
             return true;
         Variable temp = getNextVariable();
 
-        for (Value v:temp.domain) {
+        for (Value v : temp.domain) {
             noOfNodes++;
             Vector<Change> changes = updateHeuristics(temp.x, temp.y, v.value);
-            if(invalid)
+            if (invalid)
                 return revert(changes, temp);
             if (backtrack())
                 return true;

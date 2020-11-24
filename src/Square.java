@@ -127,31 +127,56 @@ public abstract class Square {
                     }
                     break;
                 case MAX_DYNAMIC_DEGREE:
+                    if (v1.dynamicDegree < v2.dynamicDegree) {
+                        v1 = v2;
+                        index = i;
+                    }
+                    break;
+                case MIN_DYNAMIC_DEGREE:
                     if (v1.dynamicDegree > v2.dynamicDegree) {
                         v1 = v2;
                         index = i;
                     }
                     break;
                 case BRELAZ:
-                    if (v1.dynamicDegree > v2.dynamicDegree) {
-                        v1 = v2;
-                        index = i;
-                    }
-                    else if (v1.dynamicDegree == v2.dynamicDegree) {
-                        if (v1.domain.size() > v2.domain.size()) {
-                            v1 = v2;
-                            index = i;
-                        }
-                    }
-//                    if (v1.domain.size() == v2.domain.size()) {
-//                        if (v1.dynamicDegree > v2.dynamicDegree) {
+//                    if (v1.dynamicDegree > v2.dynamicDegree) {
+//                        v1 = v2;
+//                        index = i;
+//                    } else if (v1.dynamicDegree == v2.dynamicDegree) {
+//                        if (v1.domain.size() > v2.domain.size()) {
 //                            v1 = v2;
 //                            index = i;
 //                        }
-//                    } else if (v1.domain.size() > v2.domain.size()) {
+//                    }
+                    if (v1.domain.size() == v2.domain.size()) {
+                        if (v1.dynamicDegree < v2.dynamicDegree) {
+                            v1 = v2;
+                            index = i;
+                        }
+                    } else if (v1.domain.size() > v2.domain.size()) {
+                        v1 = v2;
+                        index = i;
+                    }
+                    break;
+                case BRELAZ_MIN:
+//                    if (v1.dynamicDegree > v2.dynamicDegree) {
 //                        v1 = v2;
 //                        index = i;
+//                    } else if (v1.dynamicDegree == v2.dynamicDegree) {
+//                        if (v1.domain.size() > v2.domain.size()) {
+//                            v1 = v2;
+//                            index = i;
+//                        }
 //                    }
+                    if (v1.domain.size() == v2.domain.size()) {
+                        if (v1.dynamicDegree > v2.dynamicDegree) {
+                            v1 = v2;
+                            index = i;
+                        }
+                    } else if (v1.domain.size() > v2.domain.size()) {
+                        v1 = v2;
+                        index = i;
+                    }
                     break;
                 case DOM_D_DEG:
                     if (Math.ceil((((double) v1.domain.size()) / v1.dynamicDegree)) >

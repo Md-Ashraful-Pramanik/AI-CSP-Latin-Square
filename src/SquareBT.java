@@ -8,14 +8,14 @@ public class SquareBT extends Square {
 
     @Override
     public boolean backtrack() {
-        if(unassignedVariables.size() == 0)
+        if (unassignedVariables.size() == 0)
             return true;
 
         Variable temp = getNextVariable();
 
         for (byte i = 1; i <= dimension; i++) {
             noOfNodes++;
-            if(!temp.domain.contains(values[i]))
+            if (!temp.domain.contains(values[i]))
                 noOfFailure++;
             else {
                 Vector<Change> changes = updateHeuristics(temp.x, temp.y, i);

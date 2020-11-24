@@ -1,5 +1,5 @@
 import java.io.File;
-import java.nio.file.Files;
+import java.io.FileWriter;
 
 public class Main {
     public static void main(String[] args) {
@@ -7,21 +7,33 @@ public class Main {
 
         String[] fileNames = testCaseFileNames();
 
-//
-//        for (String fileName : fileNames) {
-//            for (AlgorithmTypes types : AlgorithmTypes.values()) {
-                Square latinSquare = SquareFactory.getSquare(AlgorithmTypes.BACKTRACKING,
-                        Heuristics.BRELAZ, "data/d-15-01.txt.txt");
+        try {
+            FileWriter reportWriter = new FileWriter(new File("result.csv"));
 
-                latinSquare.backtrack();
-                //latinSquare.print();
+            for (String fileName : fileNames) {
+                for (Heuristics heuristics : Heuristics.values()) {
+                    for (AlgorithmTypes types : AlgorithmTypes.values()) {
+                        Square latinSquare = SquareFactory.getSquare(types, heuristics, fileName);
 
-                //System.out.println("Algorithm: " + types + ". TestCase: " + fileName);
-                latinSquare.printResult();
-                System.out.println();
-//            }
-//        }
+                        latinSquare.backtrack();
+                        //latinSquare.print();
 
+                        System.out.println("Algorithm: " + types +
+                                ", Heuristics: " + heuristics + ", TestCase: " + fileName);
+                        latinSquare.printResult();
+                        System.out.println();
+                        reportWriter.write(latinSquare.noOfNodes + ", " + latinSquare.noOfFailure + ", ");
+                    }
+                }
+                reportWriter.write("\n");
+                reportWriter.flush();
+            }
+
+            reportWriter.flush();
+            reportWriter.close();
+        } catch (Exception e) {
+            System.out.println("Can not open report file.");
+        }
     }
 
     public static String[] testCaseFileNames() {

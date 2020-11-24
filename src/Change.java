@@ -12,7 +12,7 @@ public class Change {
         this.ibs = ibs;
     }
 
-    public Change(Variable v){
+    public Change(Variable v) {
         this(v.x, v.y, v.dynamicDegree, v.ibs);
     }
 }

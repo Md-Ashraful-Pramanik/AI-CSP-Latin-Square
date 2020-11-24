@@ -3,18 +3,18 @@ import java.util.Scanner;
 
 public class SquareFactory {
 
-    public static Square getSquare(AlgorithmTypes algorithmsTypes, Heuristics heuristics, String inputDir){
+    public static Square getSquare(AlgorithmTypes algorithmsTypes, Heuristics heuristics, String inputDir) {
 
         byte[][] square = takeInput(inputDir);
         Configuration configuration = new Configuration(heuristics);
-        if(algorithmsTypes == null)
+        if (algorithmsTypes == null)
             return new SquareFC(square, configuration);
-        switch (algorithmsTypes){
+        switch (algorithmsTypes) {
             case BACKTRACKING:
-                return  new SquareBT(square, configuration);
+                return new SquareBT(square, configuration);
             case FORWARD_CHECKING:
                 return new SquareFC(square, configuration);
-            case MAXIMAL_ARC_CONSISTENCY:
+            case MAINTAINING_ARC_CONSISTENCY:
                 return new SquareMAC(square, configuration);
         }
 
@@ -22,7 +22,7 @@ public class SquareFactory {
     }
 
 
-    public static byte[][] takeInput(String inputDir){
+    public static byte[][] takeInput(String inputDir) {
         try {
             Scanner scanner = new Scanner(new File(inputDir));
             String line = scanner.nextLine();
@@ -48,11 +48,11 @@ public class SquareFactory {
 
             byte[][] square = new byte[dimension][dimension];
 
-            for (int x = 0, y=0; x < tokens.length; x++) {
+            for (int x = 0, y = 0; x < tokens.length; x++) {
                 if (tokens[x].length() == 0)
                     continue;
-                int i = y/dimension;
-                int j = y%dimension;
+                int i = y / dimension;
+                int j = y % dimension;
 
                 square[i][j] = (byte) Integer.parseInt(tokens[x]);
                 y++;

@@ -8,7 +8,7 @@ public class SquareMAC extends Square {
 
     @Override
     public boolean backtrack() {
-        if(unassignedVariables.size() == 0)
+        if (unassignedVariables.size() == 0)
             return true;
 
         Variable temp = getNextVariable();

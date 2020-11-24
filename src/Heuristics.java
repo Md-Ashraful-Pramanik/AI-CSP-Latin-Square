@@ -1,7 +1,8 @@
 public enum Heuristics {
     SDF,
-    MAX_DYNAMIC_DEGREE,
     BRELAZ,
+    BRELAZ_MIN,
+    MIN_DYNAMIC_DEGREE,
+    MAX_DYNAMIC_DEGREE,
     DOM_D_DEG,
-    IBS
 }

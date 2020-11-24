@@ -5,13 +5,11 @@ public class Configuration {
         this.heuristics = heuristics;
     }
 
-    public boolean needToCalculateDynamicDegree(){
-        return heuristics == Heuristics.MAX_DYNAMIC_DEGREE ||
-                heuristics == Heuristics.BRELAZ ||
-                heuristics == Heuristics.DOM_D_DEG;
+    public boolean needToCalculateDynamicDegree() {
+        return heuristics != Heuristics.SDF;
     }
-
-    public boolean needToCalculateIBS(){
-        return heuristics == Heuristics.IBS;
-    }
+//
+//    public boolean needToCalculateIBS(){
+//        return heuristics == Heuristics.IBS;
+//    }
 }

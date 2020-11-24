@@ -2,7 +2,7 @@ public class Value {
     public byte value;
     public double ibs;
 
-    public Value(byte v){
+    public Value(byte v) {
         value = v;
         ibs = 0;
     }
@@ -14,9 +14,9 @@ public class Value {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Byte)
+        if (obj instanceof Byte)
             return value == (Byte) obj;
-        if(!(obj instanceof Value))
+        if (!(obj instanceof Value))
             return false;
         return value == ((Value) obj).value;
     }

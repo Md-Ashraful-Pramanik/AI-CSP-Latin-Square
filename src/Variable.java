@@ -9,7 +9,7 @@ public class Variable {
     byte x;
     byte y;
 
-    public Variable(byte domainSize, byte i, byte j){
+    public Variable(byte domainSize, byte i, byte j) {
         x = i;
         y = j;
         domain = new HashSet<>(domainSize);
@@ -19,18 +19,18 @@ public class Variable {
             domain.add(new Value(k));
     }
 
-    public byte getByteValue(){
-        if(value == null)
+    public byte getByteValue() {
+        if (value == null)
             return Constants.NOT_SET;
 
         return value.value;
     }
 
-    public boolean isAssigned(){
+    public boolean isAssigned() {
         return value != null;
     }
 
-    public boolean isNotAssigned(){
+    public boolean isNotAssigned() {
         return value == null;
     }
 
@@ -41,7 +41,7 @@ public class Variable {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof Variable))
+        if (!(obj instanceof Variable))
             return false;
         Variable v = (Variable) obj;
 //        if (getByteValue() != v.getByteValue())
